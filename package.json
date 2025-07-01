@@ -1,0 +1,12 @@
+{
+  "private": "true",
+  "scripts": {
+    "format": "prettier --write . && shfmt --write --list .",
+    "format:check": "prettier --check . && shfmt --diff .",
+    "spell:check": "cspell ."
+  },
+  "devDependencies": {
+    "cspell": "^9.1.2",
+    "prettier": "^3.6.2"
+  }
+}

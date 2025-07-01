@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "mads-hartmann.bash-ide-vscode",
+    "mkhl.shfmt",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

@@ -4,6 +4,21 @@
 
 Git-aware Bash prompt with 24-bit colors, Nerd Fonts, and multiple themes.
 
+## Dev Tools
+
+VS Code Extensions used:
+
+- [Bash IDE](https://marketplace.visualstudio.com/items?itemName=mads-hartmann.bash-ide-vscode)
+- [shfmt](https://marketplace.visualstudio.com/items?itemName=mkhl.shfmt)
+- [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+
+Formatting & linting tools used:
+
+- [shfmt](https://pkg.go.dev/mvdan.cc/sh/v3#section-readme) (Go ecosystem) - formats shell scripts (`*.sh`).
+- [Prettier](https://prettier.io/docs/install) (JS ecosystem) - formats Markdown (`*.md`) and JSON (`*.json`) files.
+- [CSpell](https://cspell.org/docs/installation) (JS ecosystem) - performs spell checking across all file types.
+
 ## Disclaimer
 
 This script was built through trial and error for personal use. It’s not perfect, not minimal, and not meant to be. Bash has serious limitations for things like real-time clock updates, `RPROMPT`, or reacting to terminal events (`SIGWINCH`, `SIGCONT`, etc.).
@@ -32,7 +47,7 @@ Make sure to replace `/path/to/bash-pretty-prompt/pretty-prompt.sh` with the act
 Copy the example config:
 
 ```bash
-cp env.sh.example env.sh
+cp example.env.sh env.sh
 ```
 
 Then edit `env.sh` to customize colors, icons, theme, and other options.

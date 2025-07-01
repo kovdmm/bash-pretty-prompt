@@ -1,120 +1,81 @@
-WHITE="255;255;255"
-BLACK="0;0;0"
-BLUE="22;62;103"
-YELLOW="110;80;0"
-GREEN="40;127;119"
+#!/bin/bash
 
-RESET="\e[0m"
-FG_RGB="\e[38;2;"
-BG_RGB="\e[48;2;"
+BPP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$BPP_ROOT/globals.sh"
 
-SEPARATOR_RIGHT=""
-SEPARATOR_LEFT=""
-
-FOLDER_ICON=$'\uf115'
-BRANCH_ICON=$'\uf418'
-CLOCK_ICON=$'\uf43a'
-GITHUB_ICON=$'\ue709'
-GITLAB_ICON=$'\ue7eb'
-BITBUCKET_ICON=$'\uf171'
-
-# load environment
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -f "$SCRIPT_DIR/env.sh" ]]; then
-  source "$SCRIPT_DIR/env.sh"
-fi
-
-RESET_HIDDEN="\[$RESET\]"
-FG_BLACK="${FG_RGB}${BLACK}m"
-FG_BLACK_HIDDEN="\[$FG_BLACK\]"
-FG_WHITE="${FG_RGB}${WHITE}m"
-FG_WHITE_HIDDEN="\[$FG_WHITE\]"
-BG_WHITE="${BG_RGB}${WHITE}m"
-BG_WHITE_HIDDEN="\[$BG_WHITE\]"
-BG_BLUE="${BG_RGB}${BLUE}m"
-BG_BLUE_HIDDEN="\[$BG_BLUE\]"
-FG_BLUE="${FG_RGB}${BLUE}m"
-FG_BLUE_HIDDEN="\[$FG_BLUE\]"
-BG_YELLOW="${BG_RGB}${YELLOW}m"
-BG_YELLOW_HIDDEN="\[$BG_YELLOW\]"
-FG_YELLOW="${FG_RGB}${YELLOW}m"
-FG_YELLOW_HIDDEN="\[$FG_YELLOW}\]"
-BG_GREEN="${BG_RGB}${GREEN}m"
-BG_GREEN_HIDDEN="\[$BG_GREEN\]"
-FG_GREEN="${FG_RGB}${GREEN}m"
-FG_GREEN_HIDDEN="\[$FG_GREEN\]"
-
-parse_git_dirty() {
-  [[ -n $(git status --porcelain 2>/dev/null) ]] && echo '*'
+__bpp_git_dirty() {
+  [[ -n "$(git status --porcelain 2>/dev/null)" ]] && echo '*'
 }
 
-parse_git_remote() {
-  if [[ -n $(git remote 2>/dev/null) ]]; then
-    local remotes=$(git remote -v 2>/dev/null)
+__bpp_git_remote() {
+  if [[ -n "$(git remote 2>/dev/null)" ]]; then
+    local remotes
+    remotes=$(git remote -v 2>/dev/null)
     if [[ "$remotes" == *github.com* ]]; then
-      printf "${GITHUB_ICON}"
+      echo "$BPP_GITHUB_ICON"
     elif [[ "$remotes" == *bitbucket.org* ]]; then
-      printf "${BITBUCKET_ICON}"
+      echo "$BPP_BITBUCKET_ICON"
     else
-      printf "${GITLAB_ICON}"
+      echo "$BPP_GITLAB_ICON"
     fi
   fi
 }
 
-parse_git_branch() {
+__bpp_git_branch() {
   git rev-parse --abbrev-ref HEAD 2>/dev/null
 }
 
-formatted_git_branch() {
-  if [[ "$(parse_git_branch)" != "" ]]; then
-    printf "${BG_YELLOW}${SEPARATOR_RIGHT}${FG_WHITE} $(parse_git_remote) ${BRANCH_ICON} $(parse_git_branch)$(parse_git_dirty) ${RESET}${FG_YELLOW}"
+__bpp_git_branch_formatted() {
+  if [[ "$(__bpp_git_branch)" != "" ]]; then
+    echo -e "${BBP_GIT_BG}${BPP_SEP_R}${BPP_MAIN_FG} $(__bpp_git_remote) ${BPP_BRANCH_ICON} $(__bpp_git_branch)$(__bpp_git_dirty) ${BPP_RESET}${BBP_GIT_FG}"
   else
-    printf "${FG_BLUE}"
+    echo -e "${BPP_RESET}${BPP_CWD_FG}"
   fi
 }
 
-function update_prompt_components() {
-  GIT_BRANCH_PRETTY_PROMPT="$(formatted_git_branch)"
-  GIT_BRANCH_PROMPT="$(__git_ps1)"
-  PROMPT_TIME="$(date +%H:%M)"
-  printf "\e]0;%s:%s\007" "${TITLEPREFIX}" "${PWD}" # set title
+__bpp_title() {
+  if [[ -n "$BPP_TITLE" ]]; then
+    printf "\e]0;%s\007" "$BPP_TITLE"
+  else
+    printf "\e]0;%s\007" "$BPP_TITLE"
+  fi
 }
 
-PROMPT_COMMAND=update_prompt_components
-
-simple() {
-  PS1="\n\
-\[\e[32m\]\u@\h \[\e[35m\]${MSYSTEM} \[\e[33m\]\w\[\e[36m\]\${GIT_BRANCH_PROMPT}\
-${RESET_HIDDEN}\n$ "
+__bpp_theme_simple() {
+  PS1="\`__bpp_title\`\n\
+\[\e[32m\]\u@\h \[\e[35m\]${MSYSTEM} \[\e[33m\]\w\[\e[36m\]\`__git_ps1\`${BPP_RESET}\n\
+$ "
 }
 
-pretty() {
-  PS1="\n\
-${BG_BLUE_HIDDEN}${FG_WHITE_HIDDEN} ${FOLDER_ICON} \w ${RESET_HIDDEN}${FG_BLUE_HIDDEN}\
-\${GIT_BRANCH_PRETTY_PROMPT}\
-${SEPARATOR_RIGHT}\
-${RESET_HIDDEN}\n$ "
+__bpp_theme_pretty() {
+  PS1="\`__bpp_title\`\n\
+${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON} \w ${BPP_RESET}${BPP_CWD_FG}\
+\`__bpp_git_branch_formatted\`${BPP_SEP_R}${BPP_RESET}\n\
+$ "
 }
 
-minimalistic() {
-  PS1="\n\
-${BG_BLUE_HIDDEN}${FG_WHITE_HIDDEN} ${FOLDER_ICON} \w ${RESET_HIDDEN}${FG_BLUE_HIDDEN}\
-\${GIT_BRANCH_PRETTY_PROMPT}\
-${SEPARATOR_RIGHT}\
-${RESET_HIDDEN}\n${BG_GREEN_HIDDEN}${FG_WHITE_HIDDEN} $ ${RESET_HIDDEN}${FG_GREEN_HIDDEN}${SEPARATOR_RIGHT}${RESET_HIDDEN} "
+__bpp_theme_minimalistic() {
+  PS1="\`__bpp_title\`\n\
+${BPP_MAIN_FG}${BPP_CWD_BG} ${BPP_FOLDER_ICON} \w ${BPP_CWD_FG}\
+\`__bpp_git_branch_formatted\`${BPP_SEP_R}\n\
+\[${BBP_TIME_BG}${BPP_MAIN_FG}\] $ \[${BPP_RESET}${BBP_TIME_FG}\]${BPP_SEP_R}\[${BPP_RESET}\] "
 }
 
-involved() {
-  PS1="\n\
-┌${FG_BLUE_HIDDEN}${SEPARATOR_LEFT}${BG_BLUE_HIDDEN}${FG_WHITE_HIDDEN} ${FOLDER_ICON} \w ${RESET_HIDDEN}${FG_BLUE_HIDDEN}\
-\${GIT_BRANCH_PRETTY_PROMPT}\
-${BG_GREEN_HIDDEN}${SEPARATOR_RIGHT}${FG_WHITE_HIDDEN} ${CLOCK_ICON} \${PROMPT_TIME} ${RESET_HIDDEN}${FG_GREEN_HIDDEN}${SEPARATOR_RIGHT}\
-${RESET_HIDDEN}\n╰┈➤ "
+__bpp_theme_involved() {
+  PS1="\`__bpp_title\`\n\
+╭${BPP_CWD_FG}${BPP_SEP_L}${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON} \w ${BPP_RESET}${BPP_CWD_FG}\
+\`__bpp_git_branch_formatted\`${BBP_TIME_BG}${BPP_SEP_R}\
+${BPP_MAIN_FG} ${BPP_CLOCK_ICON} \`date +%H:%M\` ${BPP_RESET}${BBP_TIME_FG}${BPP_SEP_R}\
+\[${BPP_RESET}\]\n\
+╰┈➤  "
 }
 
 # setup theme
-if [ -n "$BASH_THEME" ]; then
-  $BASH_THEME || involved
+if [[ -n "$BPP_THEME" ]]; then
+  if ! "__bpp_theme_$BPP_THEME" 2>/dev/null; then
+    echo "Invalid BPP_THEME value: '$BPP_THEME'. Falling back to 'pretty'."
+    __bpp_theme_pretty
+  fi
 else
-  involved
+  __bpp_theme_pretty
 fi
