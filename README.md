@@ -1,6 +1,6 @@
 # bash-pretty-prompt
 
-![image](https://github.com/user-attachments/assets/b50805e8-4225-4a19-8030-892966afe09a)
+[![image](https://github.com/user-attachments/assets/b50805e8-4225-4a19-8030-892966afe09a)](#bash-pretty-prompt)
 
 Git-aware Bash prompt with 24-bit colors, Nerd Fonts, and multiple themes.
 
