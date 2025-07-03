@@ -5,8 +5,6 @@ if [[ -n "$__BPP_GLOBALS_SH_SOURCED" ]]; then
 fi
 __BPP_GLOBALS_SH_SOURCED=1
 
-source "$BPP_ROOT/helpers.sh"
-
 # global variables
 BPP_FG_MAIN_RGB="255;255;255"
 BPP_BG_CWD_RGB="22;62;103"
