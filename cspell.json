@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "kovdmm",
+    "Dmitry",
+    "shfmt",
+    "RPROMPT",
+    "SIGWINCH",
+    "SIGCONT",
+    "cmdline",
+    "TITLEPREFIX",
+    "msystem"
+  ],
+  "ignoreRegExpList": ["\\\\u[a-z0-9]{4}"],
+  "ignorePaths": ["node_modules/", "package-lock.json"]
+}
