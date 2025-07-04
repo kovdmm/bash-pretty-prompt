@@ -11,7 +11,8 @@
     "SIGCONT",
     "cmdline",
     "TITLEPREFIX",
-    "msystem"
+    "msystem",
+    "powerline"
   ],
   "ignoreRegExpList": ["\\\\u[a-z0-9]{4}"],
   "ignorePaths": ["node_modules/", "package-lock.json"]

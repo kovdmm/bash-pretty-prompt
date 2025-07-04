@@ -48,13 +48,12 @@ __bpp_git_remote_icon() {
     local remotes
     remotes=$(git remote -v 2>/dev/null)
     if [[ "$remotes" == *github.com* ]]; then
-      echo -n "$BPP_GITHUB_ICON"
+      echo "$BPP_GITHUB_ICON"
     elif [[ "$remotes" == *bitbucket.org* ]]; then
-      echo -n "$BPP_BITBUCKET_ICON"
+      echo "$BPP_BITBUCKET_ICON"
     else
-      echo -n "$BPP_GITLAB_ICON"
+      echo "$BPP_GITLAB_ICON"
     fi
-    echo -n " "
   fi
 }
 
@@ -81,7 +80,7 @@ __bpp_git_ref_pretty() {
   local ref
   ref="$(__bpp_git_ref)"
   if [[ -n "$ref" ]]; then
-    echo -e "${BBP_GIT_BG}${BPP_SEP_R}${BPP_MAIN_FG} $(__bpp_git_remote_icon)${BPP_BRANCH_ICON} $ref ${BPP_RESET}${BBP_GIT_FG}"
+    echo -e "${BBP_GIT_BG}${BPP_SEP_R}${BPP_MAIN_FG} $(__bpp_git_remote_icon)${BPP_BRANCH_ICON}$ref ${BPP_RESET}${BBP_GIT_FG}"
   else
     echo -e "${BPP_RESET}${BPP_CWD_FG}"
   fi
@@ -96,23 +95,23 @@ $ "
 
 __bpp_theme_pretty() {
   PS1="\`__bpp_title\`\n\
-${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON} \w ${BPP_RESET}${BPP_CWD_FG}\
+${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON}\w ${BPP_RESET}${BPP_CWD_FG}\
 \`__bpp_git_ref_pretty\`${BPP_SEP_R}${BPP_RESET}\n\
 $ "
 }
 
 __bpp_theme_minimalistic() {
   PS1="\`__bpp_title\`\n\
-${BPP_MAIN_FG}${BPP_CWD_BG} ${BPP_FOLDER_ICON} \w ${BPP_CWD_FG}\
+${BPP_MAIN_FG}${BPP_CWD_BG} ${BPP_FOLDER_ICON}\w ${BPP_CWD_FG}\
 \`__bpp_git_ref_pretty\`${BPP_SEP_R}\n\
 \[${BBP_TIME_BG}${BPP_MAIN_FG}\] $ \[${BPP_RESET}${BBP_TIME_FG}\]${BPP_SEP_R}\[${BPP_RESET}\] "
 }
 
 __bpp_theme_involved() {
   PS1="\`__bpp_title\`\n\
-╭${BPP_CWD_FG}${BPP_SEP_L}${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON} \w ${BPP_RESET}${BPP_CWD_FG}\
+╭${BPP_CWD_FG}${BPP_SEP_L}${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON}\w ${BPP_RESET}${BPP_CWD_FG}\
 \`__bpp_git_ref_pretty\`${BBP_TIME_BG}${BPP_SEP_R}\
-${BPP_MAIN_FG} ${BPP_CLOCK_ICON} \`date +%H:%M\` ${BPP_RESET}${BBP_TIME_FG}${BPP_SEP_R}\
+${BPP_MAIN_FG} ${BPP_CLOCK_ICON}\`date +%H:%M\` ${BPP_RESET}${BBP_TIME_FG}${BPP_SEP_R}\
 \[${BPP_RESET}\]\n\
 ╰┈➤ "
 }
@@ -136,3 +135,10 @@ source "$BPP_ROOT/globals.sh"
 __bpp_before_theme_setup 2>/dev/null
 __bpp_setup_theme $BPP_THEME
 __bpp_after_theme_setup 2>/dev/null
+
+# adding bpp executable (as source to be able to change values live)
+source "$BPP_ROOT/cli/cli.sh"
+alias bpp=__bpp_cli
+alias bash-pretty-prompt=__bpp_cli
+complete -F __bpp_complete bpp
+complete -F __bpp_complete bash-pretty-prompt

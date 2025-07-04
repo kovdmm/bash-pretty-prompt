@@ -4,11 +4,14 @@
 # Prompt theme: simple | pretty | minimalistic | involved
 BPP_THEME="pretty"
 
-# Set to "false" if your terminal doesn't support Nerd Fonts (icons will fall back to emojis)
-BPP_NERD_FONT_ICONS="true"
+# Prompt icons: nerd_font | emoji | none
+BPP_ICONS="nerd_font"
+
+# Prompt separators: powerline | unicode | none
+BPP_SEPARATORS="powerline"
 
 # Terminal window title (supports variables and command substitution)
-BPP_TITLE="$(whoami): $PWD"
+BPP_TITLE="[Pretty Bash] $(whoami)@$(hostname): $(pwd)"
 
 # RGB colors in format "R;G;B" (each component: 0–255)
 BPP_FG_MAIN_RGB="255;255;255" # Foreground text color

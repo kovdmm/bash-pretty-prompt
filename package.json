@@ -1,6 +1,14 @@
 {
-  "private": "true",
+  "name": "bash-pretty-prompt",
+  "description": "",
+  "version": "0.0.1",
+  "author": "kovdmm",
+  "bin": {
+    "bpp": "./cli/bpp",
+    "bash-pretty-prompt": "./cli/bpp"
+  },
   "scripts": {
+    "setup": "sh ./scripts/setup.sh",
     "format": "prettier --write . && shfmt --write --list .",
     "format:check": "prettier --check . && shfmt --diff .",
     "spell:check": "cspell ."
