@@ -140,5 +140,5 @@ __bpp_after_theme_setup 2>/dev/null
 source "$BPP_ROOT/cli/cli.sh"
 alias bpp=__bpp_cli
 alias bash-pretty-prompt=__bpp_cli
-complete -F __bpp_complete bpp
-complete -F __bpp_complete bash-pretty-prompt
+complete -F __bpp_cli_complete bpp
+complete -F __bpp_cli_complete bash-pretty-prompt
