@@ -1,17 +1,44 @@
 {
-  "name": "bash-pretty-prompt",
-  "description": "",
-  "version": "0.0.1",
+  "name": "@kovdmm/bpp",
+  "description": "Git-aware Bash prompt with colors, icons, themes, and a setup CLI",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
   "author": "kovdmm",
-  "bin": {
-    "bpp": "./cli/bpp",
-    "bash-pretty-prompt": "./cli/bpp"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kovdmm/bash-pretty-prompt.git"
   },
+  "bugs": {
+    "url": "https://github.com/kovdmm/bash-pretty-prompt/issues"
+  },
+  "homepage": "https://github.com/kovdmm/bash-pretty-prompt#readme",
+  "keywords": [
+    "bash",
+    "prompt",
+    "cli",
+    "shell",
+    "theme"
+  ],
+  "bin": {
+    "bpp": "cli/bpp"
+  },
+  "files": [
+    "cli/",
+    "pretty-prompt.sh",
+    "globals.sh",
+    "example.env.sh",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "setup": "sh ./scripts/setup.sh",
+    "setup": "bash ./cli/bpp setup",
     "format": "prettier --write . && shfmt --write --list .",
     "format:check": "prettier --check . && shfmt --diff .",
-    "spell:check": "cspell ."
+    "spell:check": "cspell .",
+    "spell:fix": "cspell --fix ."
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "cspell": "^9.1.2",

@@ -9,12 +9,11 @@ __BPP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BPP_ROOT="$(dirname "$__BPP_SOURCE_DIR")"
 BPP_ENV="$BPP_ROOT/env.sh"
 
-BPP_OPTIONS=(setup theme icons separators status fix help)
+BPP_OPTIONS=(setup theme icons separators status help)
 BPP_VALID_THEMES=(simple pretty minimalistic involved)
 BPP_ICON_PRESETS=(nerd_font emoji none)
 BPP_SEPARATOR_PRESETS=(powerline unicode none)
 BPP_STATUS_OPTIONS=(enable disable)
-BPP_FIX_OPTIONS=(vscode)
 BPP_HELP_OPTIONS=(help -h --help)
 
 __bpp_cli() {
@@ -57,9 +56,6 @@ __bpp_cli() {
     __BPP_ENV_VAR="BPP_STATUS"
     __bpp_cli_validate_config_and_apply_changes || return 1
     ;;
-  fix)
-    echo "TODO: vscode (fix coloring)" # TODO: vscode (fix coloring)
-    ;;
   help | --help | -h | '')
     __bpp_cli_help
     ;;
@@ -79,23 +75,70 @@ __bpp_is_help() {
 }
 
 __bpp_integrate_shell() {
-  if grep -q pretty-prompt.sh ~/.bashrc; then
-    echo "bash-pretty-prompt is already integrated"
+  local bashrc="$HOME/.bashrc"
+  local shell marker_line line_count
+  local target_if target_source escaped_target_if escaped_target_source
+  local existing_if existing_source existing_fi
+
+  shell="$BPP_ROOT/pretty-prompt.sh"
+  target_if="if [[ -f \"$shell\" ]]; then"
+  target_source="  source \"$shell\""
+
+  if [[ ! -f "$bashrc" ]]; then
+    : >"$bashrc" || {
+      echo "Cannot create ~/.bashrc" >&2
+      return 1
+    }
+  fi
+
+  marker_line="$(grep -n -m1 '^# bash-pretty-prompt$' "$bashrc" | cut -d: -f1)"
+
+  echo "bash-pretty-prompt root: '$BPP_ROOT'"
+  if [[ -z "$marker_line" ]]; then
+    __bpp_write_integration_block "$bashrc"
+    echo "bash-pretty-prompt integrated successfully"
   else
-    echo "bash-pretty-prompt root: '$BPP_ROOT'"
-    if __bpp_append_bashrc; then
-      echo "bash-pretty-prompt integrated successfully"
-      echo "To see changes, start a new bash session (run: bash)"
+    line_count="$(wc -l <"$bashrc")"
+    if ((line_count < marker_line + 3)); then
+      sed -i "${marker_line},\$d" "$bashrc"
+      __bpp_write_integration_block "$bashrc"
+      echo "bash-pretty-prompt integration path updated"
     else
-      echo "Cannot integrate bash-pretty-prompt" >&2
-      exit 1
+      existing_if="$(sed -n "$((marker_line + 1))p" "$bashrc")"
+      existing_source="$(sed -n "$((marker_line + 2))p" "$bashrc")"
+      existing_fi="$(sed -n "$((marker_line + 3))p" "$bashrc")"
+
+      escaped_target_if="$(__bpp_escape_sed_replacement "$target_if")"
+      escaped_target_source="$(__bpp_escape_sed_replacement "$target_source")"
+      sed -i "${marker_line}s|.*|# bash-pretty-prompt|" "$bashrc"
+      sed -i "$((marker_line + 1))s|.*|$escaped_target_if|" "$bashrc"
+      sed -i "$((marker_line + 2))s|.*|$escaped_target_source|" "$bashrc"
+      sed -i "$((marker_line + 3))s|.*|fi|" "$bashrc"
+
+      if [[ "$existing_if" == "$target_if" && "$existing_source" == "$target_source" && "$existing_fi" == "fi" ]]; then
+        echo "bash-pretty-prompt is already integrated"
+      else
+        echo "bash-pretty-prompt integration path updated"
+      fi
     fi
   fi
+  echo "To see changes, start a new bash session (run: bash)"
 }
 
-__bpp_append_bashrc() {
+__bpp_escape_sed_replacement() {
+  printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'
+}
+
+__bpp_write_integration_block() {
+  local output_file="$1"
   local shell="$BPP_ROOT/pretty-prompt.sh"
-  echo -e "\n# bash-pretty-prompt\nif [[ -f \"$shell\" ]]; then\n  source \"$shell\"\nfi" >>~/.bashrc
+  {
+    echo
+    echo "# bash-pretty-prompt"
+    echo "if [[ -f \"$shell\" ]]; then"
+    echo "  source \"$shell\""
+    echo "fi"
+  } >>"$output_file"
 }
 
 __bpp_bootstrap_env() {
@@ -146,8 +189,8 @@ __bpp_cli_validate_config_and_apply_changes() {
   echo "The $__BPP_ENV_VAR value set to '$__BPP_VALUE' in env.sh"
   # apply changes live if possible
   export "${__BPP_ENV_VAR}"="$__BPP_VALUE"
-  if [[ -n "$setup_function" ]]; then
-    $setup_function
+  if [[ -n "$setup_function" ]] && declare -F "$setup_function" >/dev/null; then
+    "$setup_function"
   fi
   if __bpp_setup_theme "$BPP_THEME" 2>/dev/null; then
     echo "The $__BPP_ENV_VAR value set to '$__BPP_VALUE' in terminal"
@@ -208,8 +251,4 @@ __bpp_complete() {
     return 0
   fi
 
-  if [[ $COMP_CWORD -eq 2 && $prev == "fix" ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "${BPP_FIX_OPTIONS[*]}" -- "$cur")
-    return 0
-  fi
 }
