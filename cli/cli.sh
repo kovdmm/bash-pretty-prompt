@@ -9,10 +9,11 @@ __BPP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BPP_ROOT="$(dirname "$__BPP_SOURCE_DIR")"
 BPP_ENV="$BPP_ROOT/env.sh"
 
-BPP_OPTIONS=(setup theme icons separators fix help)
+BPP_OPTIONS=(setup theme icons separators status fix help)
 BPP_VALID_THEMES=(simple pretty minimalistic involved)
 BPP_ICON_PRESETS=(nerd_font emoji none)
 BPP_SEPARATOR_PRESETS=(powerline unicode none)
+BPP_STATUS_OPTIONS=(enable disable)
 BPP_FIX_OPTIONS=(vscode)
 BPP_HELP_OPTIONS=(help -h --help)
 
@@ -48,6 +49,13 @@ __bpp_cli() {
     __BPP_CURRENT_VALUE="$BPP_SEPARATORS"
     __BPP_ENV_VAR="BPP_SEPARATORS"
     __bpp_cli_validate_config_and_apply_changes __bpp_setup_separators_preset || return 1
+    ;;
+  status)
+    __BPP_USAGE="Usage: bpp status <enable|disable>"
+    __BPP_ALLOWED_VALUES=("${BPP_STATUS_OPTIONS[@]}")
+    __BPP_CURRENT_VALUE="$BPP_STATUS"
+    __BPP_ENV_VAR="BPP_STATUS"
+    __bpp_cli_validate_config_and_apply_changes || return 1
     ;;
   fix)
     echo "TODO: vscode (fix coloring)" # TODO: vscode (fix coloring)
@@ -156,6 +164,7 @@ Commands:
   theme <theme-name>   Set prompt theme (simple, pretty, minimalistic, involved)
   icons <preset>       Set icons preset (nerd_font, emoji, none)
   separators <preset>  Set separators preset (powerline, unicode, none)
+  status <mode>        Toggle success/error status icon (enable, disable)
   help                 Show this help message
 
 Examples:
@@ -163,6 +172,7 @@ Examples:
   bpp theme involved
   bpp icons emoji
   bpp separators powerline
+  bpp status enable
 EOF
 }
 
@@ -190,6 +200,11 @@ __bpp_complete() {
 
   if [[ $COMP_CWORD -eq 2 && $prev == "separators" ]]; then
     mapfile -t COMPREPLY < <(compgen -W "${BPP_SEPARATOR_PRESETS[*]}" -- "$cur")
+    return 0
+  fi
+
+  if [[ $COMP_CWORD -eq 2 && $prev == "status" ]]; then
+    mapfile -t COMPREPLY < <(compgen -W "${BPP_STATUS_OPTIONS[*]}" -- "$cur")
     return 0
   fi
 

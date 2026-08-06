@@ -10,6 +10,9 @@ BPP_ICONS="nerd_font"
 # Prompt separators: powerline | unicode | none
 BPP_SEPARATORS="powerline"
 
+# Status icon after each command: enable | disable
+BPP_STATUS="enable"
+
 # Terminal window title (supports variables and command substitution)
 BPP_TITLE="[Pretty Bash] $(whoami)@$(hostname): $(pwd)"
 

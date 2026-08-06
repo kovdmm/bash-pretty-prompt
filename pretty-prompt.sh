@@ -42,6 +42,24 @@ __bpp_msystem() {
   fi
 }
 
+# status utils
+BPP_LAST_EXIT_CODE=0
+
+__bpp_capture_exit_code() {
+  BPP_LAST_EXIT_CODE=$?
+}
+
+__bpp_status() {
+  if [[ "$BPP_STATUS" != "enable" ]]; then
+    return
+  fi
+  if [[ "$BPP_LAST_EXIT_CODE" -eq 0 ]]; then
+    echo -e "${BPP_STATUS_SUCCESS_FG}${BPP_STATUS_SUCCESS_ICON}${BPP_RESET}"
+  else
+    echo -e "${BPP_STATUS_ERROR_FG}${BPP_STATUS_ERROR_ICON} (${BPP_LAST_EXIT_CODE})${BPP_RESET}"
+  fi
+}
+
 # git utils
 __bpp_git_remote_icon() {
   if [[ -n "$(git remote 2>/dev/null)" ]]; then
@@ -80,7 +98,7 @@ __bpp_git_ref_pretty() {
   local ref
   ref="$(__bpp_git_ref)"
   if [[ -n "$ref" ]]; then
-    echo -e "${BBP_GIT_BG}${BPP_SEP_R}${BPP_MAIN_FG} $(__bpp_git_remote_icon)${BPP_BRANCH_ICON}$ref ${BPP_RESET}${BBP_GIT_FG}"
+    echo -e "${BPP_GIT_BG}${BPP_SEP_R}${BPP_MAIN_FG} $(__bpp_git_remote_icon)${BPP_BRANCH_ICON}$ref ${BPP_RESET}${BPP_GIT_FG}"
   else
     echo -e "${BPP_RESET}${BPP_CWD_FG}"
   fi
@@ -88,30 +106,34 @@ __bpp_git_ref_pretty() {
 
 # themes
 __bpp_theme_simple() {
-  PS1="\`__bpp_title\`\n\
+  PS1="\`__bpp_status\`\n\
+\`__bpp_title\`\n\
 \[\e[32m\]\u@\h $(__bpp_msystem)\[\e[33m\]\w\[\e[36m\]\`__bpp_git_ref_simple\`${BPP_RESET}\n\
 $ "
 }
 
 __bpp_theme_pretty() {
-  PS1="\`__bpp_title\`\n\
+  PS1="\`__bpp_status\`\n\
+\`__bpp_title\`\n\
 ${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON}\w ${BPP_RESET}${BPP_CWD_FG}\
 \`__bpp_git_ref_pretty\`${BPP_SEP_R}${BPP_RESET}\n\
 $ "
 }
 
 __bpp_theme_minimalistic() {
-  PS1="\`__bpp_title\`\n\
+  PS1="\`__bpp_status\`\n\
+\`__bpp_title\`\n\
 ${BPP_MAIN_FG}${BPP_CWD_BG} ${BPP_FOLDER_ICON}\w ${BPP_CWD_FG}\
 \`__bpp_git_ref_pretty\`${BPP_SEP_R}\n\
-\[${BBP_TIME_BG}${BPP_MAIN_FG}\] $ \[${BPP_RESET}${BBP_TIME_FG}\]${BPP_SEP_R}\[${BPP_RESET}\] "
+\[${BPP_TIME_BG}${BPP_MAIN_FG}\] $ \[${BPP_RESET}${BPP_TIME_FG}\]${BPP_SEP_R}\[${BPP_RESET}\] "
 }
 
 __bpp_theme_involved() {
-  PS1="\`__bpp_title\`\n\
+  PS1="\`__bpp_status\`\n\
+\`__bpp_title\`\n\
 ╭${BPP_CWD_FG}${BPP_SEP_L}${BPP_CWD_BG}${BPP_MAIN_FG} ${BPP_FOLDER_ICON}\w ${BPP_RESET}${BPP_CWD_FG}\
-\`__bpp_git_ref_pretty\`${BBP_TIME_BG}${BPP_SEP_R}\
-${BPP_MAIN_FG} ${BPP_CLOCK_ICON}\`date +%H:%M\` ${BPP_RESET}${BBP_TIME_FG}${BPP_SEP_R}\
+\`__bpp_git_ref_pretty\`${BPP_TIME_BG}${BPP_SEP_R}\
+${BPP_MAIN_FG} ${BPP_CLOCK_ICON}\`date +%H:%M\` ${BPP_RESET}${BPP_TIME_FG}${BPP_SEP_R}\
 \[${BPP_RESET}\]\n\
 ╰┈➤ "
 }
@@ -132,6 +154,13 @@ __bpp_setup_theme() {
 # executing
 BPP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$BPP_ROOT/globals.sh"
+
+if [[ -z "$PROMPT_COMMAND" ]]; then
+  PROMPT_COMMAND="__bpp_capture_exit_code"
+elif [[ "$PROMPT_COMMAND" != *__bpp_capture_exit_code* ]]; then
+  PROMPT_COMMAND="__bpp_capture_exit_code;$PROMPT_COMMAND"
+fi
+
 __bpp_before_theme_setup 2>/dev/null
 __bpp_setup_theme $BPP_THEME
 __bpp_after_theme_setup 2>/dev/null
