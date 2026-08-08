@@ -15,7 +15,8 @@ The `setup` command:
 
 - creates `env.sh` from `example.env.sh` (if needed);
 - adds prompt integration to `~/.bashrc`;
-- updates the path automatically if package location changes.
+- updates the path automatically if package location changes;
+- resolves the installed package directory even when the `bpp` executable lives in a separate global `bin` directory (for example on macOS).
 
 After setup, start a new shell session:
 

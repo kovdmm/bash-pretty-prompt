@@ -5,7 +5,7 @@ if [[ -n "$__BPP_SH_SOURCED" ]]; then
 fi
 __BPP_SH_SOURCED=1
 
-: "${__BPP_SOURCE_DIR:=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)}"
+: "${__BPP_SOURCE_DIR:=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd)}"
 BPP_ROOT="$(dirname "$__BPP_SOURCE_DIR")"
 BPP_ENV="$BPP_ROOT/env.sh"
 
@@ -20,50 +20,50 @@ __bpp_cli() {
   __BPP_OPTION="$1"
   __BPP_VALUE="$2"
   case "$__BPP_OPTION" in
-  setup)
-    if __bpp_is_help; then
-      echo -e "Usage: bpp setup\n\nIntegrates the prompt into your shell (~/.bashrc) and prepares the configuration file (env.sh) for customization."
-      return
-    fi
-    __bpp_bootstrap_env || return 1
-    __bpp_integrate_shell || return 1
-    ;;
-  theme)
-    __BPP_USAGE="Usage: bpp theme <theme-name> (one of: simple, pretty, minimalistic, involved)"
-    __BPP_ALLOWED_VALUES=("${BPP_VALID_THEMES[@]}")
-    __BPP_CURRENT_VALUE="$BPP_THEME"
-    __BPP_ENV_VAR="BPP_THEME"
-    __bpp_cli_validate_config_and_apply_changes || return 1
-    ;;
-  icons)
-    __BPP_USAGE="Usage: bpp icons <preset> (one of: nerd_font, emoji, none)"
-    __BPP_ALLOWED_VALUES=("${BPP_ICON_PRESETS[@]}")
-    __BPP_CURRENT_VALUE="$BPP_ICONS"
-    __BPP_ENV_VAR="BPP_ICONS"
-    __bpp_cli_validate_config_and_apply_changes __bpp_setup_icons_preset || return 1
-    ;;
-  separators)
-    __BPP_USAGE="Usage: bpp separators <preset> (one of: powerline, unicode, none)"
-    __BPP_ALLOWED_VALUES=("${BPP_SEPARATOR_PRESETS[@]}")
-    __BPP_CURRENT_VALUE="$BPP_SEPARATORS"
-    __BPP_ENV_VAR="BPP_SEPARATORS"
-    __bpp_cli_validate_config_and_apply_changes __bpp_setup_separators_preset || return 1
-    ;;
-  status)
-    __BPP_USAGE="Usage: bpp status <enable|disable>"
-    __BPP_ALLOWED_VALUES=("${BPP_STATUS_OPTIONS[@]}")
-    __BPP_CURRENT_VALUE="$BPP_STATUS"
-    __BPP_ENV_VAR="BPP_STATUS"
-    __bpp_cli_validate_config_and_apply_changes || return 1
-    ;;
-  help | --help | -h | '')
-    __bpp_cli_help
-    ;;
-  *)
-    echo "Error: unknown command '$1'." >&2
-    echo "See 'bpp help' for available commands." >&2
-    return 1
-    ;;
+    setup)
+      if __bpp_is_help; then
+        echo -e "Usage: bpp setup\n\nIntegrates the prompt into your shell (~/.bashrc) and prepares the configuration file (env.sh) for customization."
+        return
+      fi
+      __bpp_bootstrap_env || return 1
+      __bpp_integrate_shell || return 1
+      ;;
+    theme)
+      __BPP_USAGE="Usage: bpp theme <theme-name> (one of: simple, pretty, minimalistic, involved)"
+      __BPP_ALLOWED_VALUES=("${BPP_VALID_THEMES[@]}")
+      __BPP_CURRENT_VALUE="$BPP_THEME"
+      __BPP_ENV_VAR="BPP_THEME"
+      __bpp_cli_validate_config_and_apply_changes || return 1
+      ;;
+    icons)
+      __BPP_USAGE="Usage: bpp icons <preset> (one of: nerd_font, emoji, none)"
+      __BPP_ALLOWED_VALUES=("${BPP_ICON_PRESETS[@]}")
+      __BPP_CURRENT_VALUE="$BPP_ICONS"
+      __BPP_ENV_VAR="BPP_ICONS"
+      __bpp_cli_validate_config_and_apply_changes __bpp_setup_icons_preset || return 1
+      ;;
+    separators)
+      __BPP_USAGE="Usage: bpp separators <preset> (one of: powerline, unicode, none)"
+      __BPP_ALLOWED_VALUES=("${BPP_SEPARATOR_PRESETS[@]}")
+      __BPP_CURRENT_VALUE="$BPP_SEPARATORS"
+      __BPP_ENV_VAR="BPP_SEPARATORS"
+      __bpp_cli_validate_config_and_apply_changes __bpp_setup_separators_preset || return 1
+      ;;
+    status)
+      __BPP_USAGE="Usage: bpp status <enable|disable>"
+      __BPP_ALLOWED_VALUES=("${BPP_STATUS_OPTIONS[@]}")
+      __BPP_CURRENT_VALUE="$BPP_STATUS"
+      __BPP_ENV_VAR="BPP_STATUS"
+      __bpp_cli_validate_config_and_apply_changes || return 1
+      ;;
+    help | --help | -h | '')
+      __bpp_cli_help
+      ;;
+    *)
+      echo "Error: unknown command '$1'." >&2
+      echo "See 'bpp help' for available commands." >&2
+      return 1
+      ;;
   esac
 }
 
@@ -85,7 +85,7 @@ __bpp_integrate_shell() {
   target_source="  source \"$shell\""
 
   if [[ ! -f "$bashrc" ]]; then
-    : >"$bashrc" || {
+    : > "$bashrc" || {
       echo "Cannot create ~/.bashrc" >&2
       return 1
     }
@@ -98,7 +98,7 @@ __bpp_integrate_shell() {
     __bpp_write_integration_block "$bashrc"
     echo "bash-pretty-prompt integrated successfully"
   else
-    line_count="$(wc -l <"$bashrc")"
+    line_count="$(wc -l < "$bashrc")"
     if ((line_count < marker_line + 3)); then
       __bpp_sed_inplace "${marker_line},\$d" "$bashrc"
       __bpp_write_integration_block "$bashrc"
@@ -137,8 +137,8 @@ __bpp_sed_inplace() {
   local script="$1" file="$2"
   local tmp
   tmp="$(mktemp)" || return 1
-  if sed "$script" "$file" >"$tmp"; then
-    cat "$tmp" >"$file"
+  if sed "$script" "$file" > "$tmp"; then
+    cat "$tmp" > "$file"
     rm -f "$tmp"
   else
     rm -f "$tmp"
@@ -155,7 +155,7 @@ __bpp_write_integration_block() {
     echo "if [[ -f \"$shell\" ]]; then"
     echo "  source \"$shell\""
     echo "fi"
-  } >>"$output_file"
+  } >> "$output_file"
 }
 
 __bpp_bootstrap_env() {
@@ -195,27 +195,27 @@ __bpp_cli_validate_config_and_apply_changes() {
   fi
   # create env.sh file if not exist
   if [[ ! -f "$BPP_ENV" ]]; then
-    __bpp_bootstrap_env 1>/dev/null || return 1
+    __bpp_bootstrap_env 1> /dev/null || return 1
   fi
   # replace or add line in env.sh
   local new_line="${__BPP_ENV_VAR}=\"${__BPP_VALUE}\""
   __bpp_sed_inplace "s/^${__BPP_ENV_VAR}=.*/${new_line}/" "$BPP_ENV"
   if ! grep -q "^${__BPP_ENV_VAR}=" "$BPP_ENV"; then
-    echo -e "\n${new_line}" >>"$BPP_ENV"
+    echo -e "\n${new_line}" >> "$BPP_ENV"
   fi
   echo "The $__BPP_ENV_VAR value set to '$__BPP_VALUE' in env.sh"
   # apply changes live if possible
   export "${__BPP_ENV_VAR}"="$__BPP_VALUE"
-  if [[ -n "$setup_function" ]] && declare -F "$setup_function" >/dev/null; then
+  if [[ -n "$setup_function" ]] && declare -F "$setup_function" > /dev/null; then
     "$setup_function"
   fi
-  if __bpp_setup_theme "$BPP_THEME" 2>/dev/null; then
+  if __bpp_setup_theme "$BPP_THEME" 2> /dev/null; then
     echo "The $__BPP_ENV_VAR value set to '$__BPP_VALUE' in terminal"
   fi
 }
 
 __bpp_cli_help() {
-  cat <<EOF
+  cat << EOF
 Usage: bpp <command> [options]
 
 Commands:
