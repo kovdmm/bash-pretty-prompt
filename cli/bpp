@@ -1,4 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-__BPP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$__BPP_SOURCE_DIR/../cli/cli.sh" && __bpp_cli "$@"
+__bpp_resolve_script_dir() {
+  local source_path current_dir
+  source_path="${BASH_SOURCE[0]}"
+
+  while [[ -h "$source_path" ]]; do
+    current_dir="$(cd -P "$(dirname "$source_path")" >/dev/null 2>&1 && pwd)"
+    source_path="$(readlink "$source_path")"
+    [[ "$source_path" != /* ]] && source_path="$current_dir/$source_path"
+  done
+
+  cd -P "$(dirname "$source_path")" >/dev/null 2>&1 && pwd
+}
+
+__BPP_SOURCE_DIR="$(__bpp_resolve_script_dir)"
+source "$__BPP_SOURCE_DIR/cli.sh" && __bpp_cli "$@"

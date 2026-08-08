@@ -5,7 +5,7 @@ if [[ -n "$__BPP_SH_SOURCED" ]]; then
 fi
 __BPP_SH_SOURCED=1
 
-__BPP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+: "${__BPP_SOURCE_DIR:=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)}"
 BPP_ROOT="$(dirname "$__BPP_SOURCE_DIR")"
 BPP_ENV="$BPP_ROOT/env.sh"
 
