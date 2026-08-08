@@ -5,7 +5,7 @@ if [[ -n "$__BPP_SH_SOURCED" ]]; then
 fi
 __BPP_SH_SOURCED=1
 
-__BPP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+: "${__BPP_SOURCE_DIR:=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)}"
 BPP_ROOT="$(dirname "$__BPP_SOURCE_DIR")"
 BPP_ENV="$BPP_ROOT/env.sh"
 
@@ -100,7 +100,7 @@ __bpp_integrate_shell() {
   else
     line_count="$(wc -l <"$bashrc")"
     if ((line_count < marker_line + 3)); then
-      sed -i "${marker_line},\$d" "$bashrc"
+      __bpp_sed_inplace "${marker_line},\$d" "$bashrc"
       __bpp_write_integration_block "$bashrc"
       echo "bash-pretty-prompt integration path updated"
     else
@@ -110,10 +110,10 @@ __bpp_integrate_shell() {
 
       escaped_target_if="$(__bpp_escape_sed_replacement "$target_if")"
       escaped_target_source="$(__bpp_escape_sed_replacement "$target_source")"
-      sed -i "${marker_line}s|.*|# bash-pretty-prompt|" "$bashrc"
-      sed -i "$((marker_line + 1))s|.*|$escaped_target_if|" "$bashrc"
-      sed -i "$((marker_line + 2))s|.*|$escaped_target_source|" "$bashrc"
-      sed -i "$((marker_line + 3))s|.*|fi|" "$bashrc"
+      __bpp_sed_inplace "${marker_line}s|.*|# bash-pretty-prompt|" "$bashrc"
+      __bpp_sed_inplace "$((marker_line + 1))s|.*|$escaped_target_if|" "$bashrc"
+      __bpp_sed_inplace "$((marker_line + 2))s|.*|$escaped_target_source|" "$bashrc"
+      __bpp_sed_inplace "$((marker_line + 3))s|.*|fi|" "$bashrc"
 
       if [[ "$existing_if" == "$target_if" && "$existing_source" == "$target_source" && "$existing_fi" == "fi" ]]; then
         echo "bash-pretty-prompt is already integrated"
@@ -127,6 +127,23 @@ __bpp_integrate_shell() {
 
 __bpp_escape_sed_replacement() {
   printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'
+}
+
+# Portable in-place sed edit.
+# GNU sed uses `sed -i SCRIPT`, but BSD/macOS sed requires a backup-suffix
+# argument (`sed -i SUFFIX SCRIPT`); calling GNU-style on macOS misparses the
+# file path as the script. Edit via a temp file so both behave the same.
+__bpp_sed_inplace() {
+  local script="$1" file="$2"
+  local tmp
+  tmp="$(mktemp)" || return 1
+  if sed "$script" "$file" >"$tmp"; then
+    cat "$tmp" >"$file"
+    rm -f "$tmp"
+  else
+    rm -f "$tmp"
+    return 1
+  fi
 }
 
 __bpp_write_integration_block() {
@@ -182,7 +199,7 @@ __bpp_cli_validate_config_and_apply_changes() {
   fi
   # replace or add line in env.sh
   local new_line="${__BPP_ENV_VAR}=\"${__BPP_VALUE}\""
-  sed -i "s/^${__BPP_ENV_VAR}=.*/${new_line}/" "$BPP_ENV"
+  __bpp_sed_inplace "s/^${__BPP_ENV_VAR}=.*/${new_line}/" "$BPP_ENV"
   if ! grep -q "^${__BPP_ENV_VAR}=" "$BPP_ENV"; then
     echo -e "\n${new_line}" >>"$BPP_ENV"
   fi
