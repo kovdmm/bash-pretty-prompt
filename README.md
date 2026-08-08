@@ -62,4 +62,4 @@ bpp help
 
 ## For Contributors
 
-Development docs are in [docs/development/README.md](docs/development/README.md).
+Contributor and architecture docs are in [docs/README.md](docs/README.md).
