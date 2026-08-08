@@ -62,9 +62,9 @@ __bpp_status() {
 
 # git utils
 __bpp_git_remote_icon() {
-  if [[ -n "$(git remote 2>/dev/null)" ]]; then
+  if [[ -n "$(git remote 2> /dev/null)" ]]; then
     local remotes
-    remotes=$(git remote -v 2>/dev/null)
+    remotes=$(git remote -v 2> /dev/null)
     if [[ "$remotes" == *github.com* ]]; then
       echo "$BPP_GITHUB_ICON"
     elif [[ "$remotes" == *bitbucket.org* ]]; then
@@ -77,9 +77,9 @@ __bpp_git_remote_icon() {
 
 __bpp_git_ref() {
   local ref dirty
-  ref="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  ref="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
   if [[ -n "$ref" ]]; then
-    if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+    if [[ -n "$(git status --porcelain 2> /dev/null)" ]]; then
       dirty='*'
     fi
     echo "${ref}${dirty}"
@@ -142,7 +142,7 @@ __bpp_setup_theme() {
   local theme
   theme=$1
   if [[ -n "$theme" ]]; then
-    if ! "__bpp_theme_$theme" 2>/dev/null; then
+    if ! "__bpp_theme_$theme" 2> /dev/null; then
       echo "Invalid theme value: '$theme'. Falling back to 'pretty'."
       __bpp_theme_pretty
     fi
@@ -161,9 +161,9 @@ elif [[ "$PROMPT_COMMAND" != *__bpp_capture_exit_code* ]]; then
   PROMPT_COMMAND="__bpp_capture_exit_code;$PROMPT_COMMAND"
 fi
 
-__bpp_before_theme_setup 2>/dev/null
+__bpp_before_theme_setup 2> /dev/null
 __bpp_setup_theme $BPP_THEME
-__bpp_after_theme_setup 2>/dev/null
+__bpp_after_theme_setup 2> /dev/null
 
 # adding bpp executable (as source to be able to change values live)
 source "$BPP_ROOT/cli/cli.sh"

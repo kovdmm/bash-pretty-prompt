@@ -4,14 +4,54 @@ __bpp_resolve_script_dir() {
   local source_path current_dir
   source_path="${BASH_SOURCE[0]}"
 
-  while [[ -h "$source_path" ]]; do
-    current_dir="$(cd -P "$(dirname "$source_path")" >/dev/null 2>&1 && pwd)"
+  while [[ -L "$source_path" ]]; do
+    current_dir="$(cd -P "$(dirname "$source_path")" > /dev/null 2>&1 && pwd)"
     source_path="$(readlink "$source_path")"
     [[ "$source_path" != /* ]] && source_path="$current_dir/$source_path"
   done
 
-  cd -P "$(dirname "$source_path")" >/dev/null 2>&1 && pwd
+  cd -P "$(dirname "$source_path")" > /dev/null 2>&1 && pwd
 }
 
-__BPP_SOURCE_DIR="$(__bpp_resolve_script_dir)"
+__bpp_print_global_npm_roots() {
+  local npm_root npm_prefix
+
+  command -v npm > /dev/null 2>&1 || return 0
+
+  npm_root="$(npm root -g 2> /dev/null)"
+  if [[ -n "$npm_root" ]]; then
+    printf '%s\n' "$npm_root"
+  fi
+
+  npm_prefix="$(npm prefix -g 2> /dev/null)"
+  if [[ -n "$npm_prefix" ]]; then
+    printf '%s\n' "$npm_prefix/lib/node_modules"
+    printf '%s\n' "$npm_prefix/node_modules"
+  fi
+}
+
+__bpp_resolve_source_dir() {
+  local script_dir npm_root candidate
+
+  script_dir="$(__bpp_resolve_script_dir)"
+  if [[ -f "$script_dir/cli.sh" ]]; then
+    printf '%s\n' "$script_dir"
+    return 0
+  fi
+
+  while IFS= read -r npm_root; do
+    [[ -z "$npm_root" ]] && continue
+
+    candidate="$npm_root/@kovdmm/bpp/cli"
+    if [[ -f "$candidate/cli.sh" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(__bpp_print_global_npm_roots)
+
+  echo "Error: cannot locate cli.sh next to bpp or in the global npm installation for @kovdmm/bpp." >&2
+  return 1
+}
+
+__BPP_SOURCE_DIR="$(__bpp_resolve_source_dir)" || exit 1
 source "$__BPP_SOURCE_DIR/cli.sh" && __bpp_cli "$@"
