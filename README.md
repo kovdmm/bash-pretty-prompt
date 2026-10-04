@@ -40,7 +40,7 @@ bpp status enable
 Available values:
 
 - `theme`: `simple`, `pretty`, `minimalistic`, `involved`
-- `icons`: `nerd_font`, `emoji`, `none`
+- `icons`: `nerd_font`, `emoji`, `text`, `none`
 - `separators`: `powerline`, `unicode`, `none`
 - `status`: `enable`, `disable`
 

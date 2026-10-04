@@ -85,7 +85,7 @@ It defines:
 
 - default option values such as theme, icons, separators, and status mode;
 - color conversion helpers output consumed by prompt rendering;
-- icon presets (`nerd_font`, `emoji`, `none`);
+- icon presets (`nerd_font`, `emoji`, `text`, `none`);
 - separator presets (`powerline`, `unicode`, `none`);
 - exported variables used by the runtime and CLI.
 

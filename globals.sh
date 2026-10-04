@@ -25,6 +25,15 @@ __bpp_setup_icons_preset() {
     BPP_BITBUCKET_ICON=$'\ud83e\uddfa ' # 🧺
     BPP_STATUS_SUCCESS_ICON=$'\u2705 '  # ✅
     BPP_STATUS_ERROR_ICON=$'\u274c '    # ❌
+  elif [[ "$BPP_ICONS" == "text" ]]; then
+    BPP_FOLDER_ICON='[f] '
+    BPP_BRANCH_ICON='[br] '
+    BPP_CLOCK_ICON='[t] '
+    BPP_GITHUB_ICON='[gh] '
+    BPP_GITLAB_ICON='[gl] '
+    BPP_BITBUCKET_ICON='[bb] '
+    BPP_STATUS_SUCCESS_ICON='[ok] '
+    BPP_STATUS_ERROR_ICON='[err] '
   else
     BPP_FOLDER_ICON=
     BPP_BRANCH_ICON=

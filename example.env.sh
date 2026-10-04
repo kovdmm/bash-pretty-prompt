@@ -4,7 +4,7 @@
 # Prompt theme: simple | pretty | minimalistic | involved
 BPP_THEME="pretty"
 
-# Prompt icons: nerd_font | emoji | none
+# Prompt icons: nerd_font | emoji | text | none
 BPP_ICONS="nerd_font"
 
 # Prompt separators: powerline | unicode | none

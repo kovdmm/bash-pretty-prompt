@@ -11,7 +11,7 @@ BPP_ENV="$BPP_ROOT/env.sh"
 
 BPP_OPTIONS=(setup theme icons separators status help)
 BPP_VALID_THEMES=(simple pretty minimalistic involved)
-BPP_ICON_PRESETS=(nerd_font emoji none)
+BPP_ICON_PRESETS=(nerd_font emoji text none)
 BPP_SEPARATOR_PRESETS=(powerline unicode none)
 BPP_STATUS_OPTIONS=(enable disable)
 BPP_HELP_OPTIONS=(help -h --help)
@@ -36,7 +36,7 @@ __bpp_cli() {
       __bpp_cli_validate_config_and_apply_changes || return 1
       ;;
     icons)
-      __BPP_USAGE="Usage: bpp icons <preset> (one of: nerd_font, emoji, none)"
+      __BPP_USAGE="Usage: bpp icons <preset> (one of: nerd_font, emoji, text, none)"
       __BPP_ALLOWED_VALUES=("${BPP_ICON_PRESETS[@]}")
       __BPP_CURRENT_VALUE="$BPP_ICONS"
       __BPP_ENV_VAR="BPP_ICONS"
@@ -222,7 +222,7 @@ Commands:
   setup                Integrate the prompt into your shell (~/.bashrc)
                        and prepare the configuration file (env.sh) if needed.
   theme <theme-name>   Set prompt theme (simple, pretty, minimalistic, involved)
-  icons <preset>       Set icons preset (nerd_font, emoji, none)
+  icons <preset>       Set icons preset (nerd_font, emoji, text, none)
   separators <preset>  Set separators preset (powerline, unicode, none)
   status <mode>        Toggle success/error status icon (enable, disable)
   help                 Show this help message
