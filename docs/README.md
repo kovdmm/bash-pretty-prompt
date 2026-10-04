@@ -154,6 +154,8 @@ Themes are implemented as separate functions inside [pretty-prompt.sh](../pretty
 - `__bpp_theme_minimalistic`
 - `__bpp_theme_involved`
 
+`__bpp_theme_minimalistic` renders a single line: the current directory name, the Git ref, and `$`. It uses plain ANSI colors and no icons, separators, or backgrounds; the status line is printed above it only when `BPP_STATUS` is `enable`.
+
 `__bpp_setup_theme` dispatches to one of these functions based on `BPP_THEME`.
 
 This design keeps:

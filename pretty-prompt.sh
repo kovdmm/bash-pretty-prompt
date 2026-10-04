@@ -60,6 +60,16 @@ __bpp_status() {
   fi
 }
 
+# prints the status on its own line, or nothing when the status is disabled
+__bpp_status_line() {
+  local status
+  status="$(__bpp_status)"
+  if [[ -n "$status" ]]; then
+    # the trailing invisible reset keeps the newline from being stripped
+    printf '%s\n\001%b\002' "$status" "$BPP_RESET"
+  fi
+}
+
 # git utils
 __bpp_git_remote_icon() {
   if [[ -n "$(git remote 2> /dev/null)" ]]; then
@@ -121,11 +131,8 @@ $ "
 }
 
 __bpp_theme_minimalistic() {
-  PS1="\`__bpp_status\`\n\
-\`__bpp_title\`\n\
-${BPP_MAIN_FG}${BPP_CWD_BG} ${BPP_FOLDER_ICON}\w ${BPP_CWD_FG}\
-\`__bpp_git_ref_pretty\`${BPP_SEP_R}\n\
-\[${BPP_TIME_BG}${BPP_MAIN_FG}\] $ \[${BPP_RESET}${BPP_TIME_FG}\]${BPP_SEP_R}\[${BPP_RESET}\] "
+  PS1="\[\`__bpp_title\`\]\`__bpp_status_line\`\
+\[\e[36m\]\W\[\e[33m\]\`__bpp_git_ref_simple\`\[${BPP_RESET}\] $ "
 }
 
 __bpp_theme_involved() {
