@@ -1,0 +1,27 @@
+description: Changes that a person has to approve after the automated review, before the task is completed.
+
+start: implement
+
+max_steps: 12
+
+steps:
+  implement:
+    skill: implement
+    next: review
+    max_visits: 3
+
+  review:
+    skill: review
+    next:
+      approved: approve
+      changes_requested: implement
+
+  approve:
+    review: Check the change on the task branch and decide whether it can be merged.
+    assigned_titles: [lead]
+    next:
+      approved: done
+      rejected: implement
+
+  done:
+    end: completed

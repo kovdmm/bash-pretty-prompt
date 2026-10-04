@@ -1,0 +1,22 @@
+description: Small code changes and bug fixes, implemented and then reviewed before completion.
+
+start: implement
+
+# A task runs at most this many steps in total.
+max_steps: 10
+
+steps:
+  implement:
+    skill: implement
+    next: review
+    # At most three implementation rounds: the first one and two rounds of review findings.
+    max_visits: 3
+
+  review:
+    skill: review
+    next:
+      approved: done
+      changes_requested: implement
+
+  done:
+    end: completed
