@@ -153,8 +153,11 @@ Themes are implemented as separate functions inside [pretty-prompt.sh](../pretty
 - `__bpp_theme_pretty`
 - `__bpp_theme_minimalistic`
 - `__bpp_theme_involved`
+- `__bpp_theme_compact`
 
 `__bpp_setup_theme` dispatches to one of these functions based on `BPP_THEME`.
+
+`compact` is the only single-line theme: status, the current directory name (`\W`), the Git segment and `$` share one line. Because the input follows the prompt on the same line, its helpers (`__bpp_status_compact`, `__bpp_git_ref_compact`) wrap every escape sequence in `\x01`/`\x02` so that readline computes the prompt width correctly.
 
 This design keeps:
 

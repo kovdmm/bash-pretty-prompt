@@ -60,6 +60,19 @@ __bpp_status() {
   fi
 }
 
+# inline status for single-line prompts: escapes are wrapped in \x01..\x02
+# (the output form of \[..\]) so readline measures the prompt width correctly
+__bpp_status_compact() {
+  if [[ "$BPP_STATUS" != "enable" ]]; then
+    return
+  fi
+  if [[ "$BPP_LAST_EXIT_CODE" -eq 0 ]]; then
+    echo -e "\x01${BPP_STATUS_SUCCESS_FG}\x02${BPP_STATUS_SUCCESS_ICON}\x01${BPP_RESET}\x02"
+  else
+    echo -e "\x01${BPP_STATUS_ERROR_FG}\x02${BPP_STATUS_ERROR_ICON}${BPP_LAST_EXIT_CODE} \x01${BPP_RESET}\x02"
+  fi
+}
+
 # git utils
 __bpp_git_remote_icon() {
   if [[ -n "$(git remote 2> /dev/null)" ]]; then
@@ -104,6 +117,17 @@ __bpp_git_ref_pretty() {
   fi
 }
 
+# same as __bpp_git_ref_pretty, with escapes wrapped for single-line prompts
+__bpp_git_ref_compact() {
+  local ref
+  ref="$(__bpp_git_ref)"
+  if [[ -n "$ref" ]]; then
+    echo -e "\x01${BPP_GIT_BG}\x02${BPP_SEP_R}\x01${BPP_MAIN_FG}\x02 $(__bpp_git_remote_icon)${BPP_BRANCH_ICON}$ref \x01${BPP_RESET}${BPP_GIT_FG}\x02"
+  else
+    echo -e "\x01${BPP_RESET}${BPP_CWD_FG}\x02"
+  fi
+}
+
 # themes
 __bpp_theme_simple() {
   PS1="\`__bpp_status\`\n\
@@ -136,6 +160,12 @@ __bpp_theme_involved() {
 ${BPP_MAIN_FG} ${BPP_CLOCK_ICON}\`date +%H:%M\` ${BPP_RESET}${BPP_TIME_FG}${BPP_SEP_R}\
 \[${BPP_RESET}\]\n\
 ╰┈➤ "
+}
+
+__bpp_theme_compact() {
+  PS1="\[\`__bpp_title\`\]\`__bpp_status_compact\`\
+\[${BPP_CWD_BG}${BPP_MAIN_FG}\] ${BPP_FOLDER_ICON}\W \[${BPP_RESET}${BPP_CWD_FG}\]\
+\`__bpp_git_ref_compact\`${BPP_SEP_R}\[${BPP_RESET}\] $ "
 }
 
 __bpp_setup_theme() {

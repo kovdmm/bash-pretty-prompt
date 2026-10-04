@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
-# Prompt theme: simple | pretty | minimalistic | involved
+# Prompt theme: simple | pretty | minimalistic | involved | compact
 BPP_THEME="pretty"
 
 # Prompt icons: nerd_font | emoji | none
